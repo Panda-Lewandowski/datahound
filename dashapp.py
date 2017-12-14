@@ -9,7 +9,7 @@ import exceptions as exc
 
 
 class CommunityAnalysisApp:
-    def __init__(self, name="manmachtmarginalien", debug=True, start=False):
+    def __init__(self, name="thevillage", debug=True, start=True):
         self.debug = debug
         self.community_name = name
         self.app = dash.Dash()
@@ -33,9 +33,9 @@ class CommunityAnalysisApp:
             print("Okey, we got some data. Start to visualize...")
         sex_pie = vws.pie_chart(self.public.sex_data(), st.SEX_COLORS, 'Sex')
 
-        funnel = vws.funnel(["Views", "Likes", 'Reposts'], self.public.likes_data(debug=True))
+        funnel = vws.funnel(["Views", "Likes", 'Reposts'], self.public.likes_data())
 
-        plat_data, sys_data = self.public.platform_dist()
+        plat_data, sys_data = self.public.platform_data()
 
         ad_data = self.public.ad_ratio()
 
@@ -85,7 +85,7 @@ class CommunityAnalysisApp:
         if self.debug:
             print("We draw this awesome graph, bro. Check it.")
 
-        self.app.run_server(debug=False)
+        self.app.run_server(port=8080)
 
 
 if __name__ == '__main__':
