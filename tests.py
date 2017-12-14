@@ -2,7 +2,6 @@ import unittest
 
 import mock
 import getters
-import settings
 import exceptions as exc
 import time
 import sys
