@@ -4,9 +4,13 @@ import mock
 import getters
 import settings
 import exceptions as exc
+import time
+import sys
+import logging
 
 from community import Community
 from mock import patch
+
 
 
 def get_test_members(group_id="test_community", members_count=10, debug=True, fields="sex"):
@@ -70,7 +74,17 @@ class TestCommunity(Community):
         self.group_id = "test_community"
 
 
+def try_to_auth():
+    try:
+        getters.auth()
+    except Exception:
+        return False
+    else:
+        return True
+
+
 @unittest.expectedFailure
+@unittest.skipUnless(try_to_auth(), "Passed as test with аuthentication.")
 class ClientTestCase(unittest.TestCase):
     def setUp(self):
         self.api = getters.auth()
@@ -107,10 +121,6 @@ class ClientTestCase(unittest.TestCase):
 
 
 class CommunityTestCase(unittest.TestCase):
-    def setUp(self):
-        self.api = getters.auth()
-
-
     @patch("getters.get_members", new=get_test_members)
     def test_sex_data(self):
         pub = TestCommunity()
@@ -158,11 +168,68 @@ class CommunityTestCase(unittest.TestCase):
             pass
 
 
+TIMES = 1
+
+@unittest.skipUnless(try_to_auth(), "Passed as test with аuthentication.")
 class GettersTestCase(unittest.TestCase):
     def setUp(self):
         self.api = getters.auth()
 
+    def test_time_get_mem(self):
+        com_pool = ['menmodelblog', "tnull", "potracheno", "roscosmos"]
+
+        logging.info("Amount    |   Asyncio    |    OneThread")
+
+        for com in com_pool:
+            members_count = self.api.groups.getMembers(group_id="nomodels").get('count', 0)
+
+            t1 = 0
+            for i in range(TIMES):
+                st = time.time()
+                getters.get_members_asy(com, members_count)
+                t1 += time.time() - st
+
+            t1 /= TIMES
+
+            t2 = 0
+            for i in range(TIMES):
+                st = time.time()
+                getters.get_members(com, members_count)
+                t2 += time.time() - st
+
+            t2 /= TIMES
+
+            logging.debug("{0}    |   {1:.5f}    |   {2:.5f}".format(members_count, t1, t2))
+
+    def test_time_get_posts(self):
+        com_pool = ['menmodelblog', "tnull", "potracheno", "roscosmos"]
+
+        logging.info("Amount    |   Asyncio    |    OneThread")
+
+        for com in com_pool:
+            members_count = self.api.wall.get(domain=com)[0]
+
+            t1 = 0
+            for i in range(TIMES):
+                st = time.time()
+                getters.get_posts_asy(com, members_count)
+                t1 += time.time() - st
+
+            t1 /= TIMES
+
+            t2 = 0
+            for i in range(TIMES):
+                st = time.time()
+                getters.get_posts(com, members_count)
+                t2 += time.time() - st
+
+            t2 /= TIMES
+
+            logging.debug("{0}    |   {1:.5f}    |   {2:.5f}".format(members_count, t1, t2))
+
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(levelname)-8s [%(asctime)s] %(message)s',
+                        level=logging.DEBUG, filename="datahound.log")
     unittest.main()
 

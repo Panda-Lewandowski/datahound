@@ -65,7 +65,6 @@ def get_members_asy(group_id, group_len, fields=ss.MEMBERS_FIELDS):
     urls = [post_url + "&membersLen={0}".format(l if l < group_len else group_len)
             for l in range(0, group_len + 25_000, 25_000)]
     members = loop.run_until_complete(mem_worker(urls))
-    print(members)
 
     return members
 
@@ -120,7 +119,6 @@ def get_posts_asy(group_id, wall_len):
     urls = [post_url + "&postsLen={0}".format(l if l < wall_len else wall_len)
             for l in range(0, wall_len + 25_000, 25_000)]
     posts = loop.run_until_complete(mem_worker(urls))
-
 
     return posts
 
