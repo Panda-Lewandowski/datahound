@@ -1,6 +1,6 @@
 import logging
 
-TOKEN = "096fb3f012902b5a1238fbbf1ef8ecbb23ff10d1a43c16e220ad8eff415791d6e801127a2c6aa60ca9c25"
+TOKEN = ""
 GOOGLE_TOKEN = ""
 BASE_URL = "https://api.vk.com/method/execute."
 MEMBERS_FIELDS = "sex"  # bdate, city, country, online, online_mobile, education, last_seen, relation
