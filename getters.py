@@ -103,7 +103,7 @@ def get_members(group_id, group_len, fields=ss.MEMBERS_FIELDS):
 
     # Use the get() method to avoid use try/catch for KeyError exception
         members += info.get('response', 'empty')
-        logging.debug("Get members:" + str(len(members)) + " from " + group_id)
+        logging.info("Get members:" + str(len(members)) + " from " + group_id)
 
     return members
 
@@ -140,11 +140,14 @@ def get_posts(group_id, wall_len):
             return error
 
         posts += info.get('response', 'empty')
-        logging.debug(("Get posts:" + str(len(posts)) + " from " + group_id))
+        logging.info(("Get posts:" + str(len(posts)) + " from " + group_id))
 
     return posts
 
 
 if __name__ == "__main__":
-    auth()
+    api = auth()
+    print(api)
+    members_count = api.wall.get(domain='menmodelblog')[0]
+    # get_members_asy(')
 

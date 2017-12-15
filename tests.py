@@ -9,6 +9,7 @@ import logging
 
 from community import Community
 from mock import patch
+from vk.exceptions import VkAPIError
 
 
 
@@ -75,8 +76,10 @@ class TestCommunity(Community):
 
 def try_to_auth():
     try:
-        getters.auth()
-    except Exception:
+        import settings
+        if settings.TOKEN == '':
+            return False
+    except ModuleNotFoundError:
         return False
     else:
         return True
@@ -167,20 +170,35 @@ class CommunityTestCase(unittest.TestCase):
             pass
 
 
-TIMES = 1
+TIMES = 3
+
 
 @unittest.skipUnless(try_to_auth(), "Passed as test with аuthentication.")
 class GettersTestCase(unittest.TestCase):
     def setUp(self):
         self.api = getters.auth()
 
+    def test_get_mem(self):
+        members_count = self.api.groups.getMembers(group_id='bo0om_ru').get('count', 0)
+
+        res1 = getters.get_members_asy('bo0om_ru', members_count)
+        res2 = getters.get_members('bo0om_ru', members_count)
+        self.assertEqual(res1, res2)
+
+    def test_get_posts(self):
+        posts_count = self.api.wall.get(domain='bo0om_ru')[0]
+
+        res1 = getters.get_posts_asy('bo0om_ru', posts_count)
+        res2 = getters.get_posts('bo0om_ru', posts_count)
+        self.assertEqual(res1, res2)
+
     def test_time_get_mem(self):
-        com_pool = ['menmodelblog', "tnull", "potracheno", "roscosmos"]
+        com_pool = ['menmodelblog']#, "tnull", "potracheno", "roscosmos"]
 
         logging.info("Amount    |   Asyncio    |    OneThread")
 
         for com in com_pool:
-            members_count = self.api.groups.getMembers(group_id="nomodels").get('count', 0)
+            members_count = self.api.groups.getMembers(group_id=com).get('count', 0)
 
             t1 = 0
             for i in range(TIMES):
@@ -201,17 +219,21 @@ class GettersTestCase(unittest.TestCase):
             logging.debug("{0}    |   {1:.5f}    |   {2:.5f}".format(members_count, t1, t2))
 
     def test_time_get_posts(self):
-        com_pool = ['menmodelblog', "tnull", "potracheno", "roscosmos"]
+        com_pool = ['menmodelblog']#, "tnull", "potracheno", "roscosmos"]
 
         logging.info("Amount    |   Asyncio    |    OneThread")
 
         for com in com_pool:
-            members_count = self.api.wall.get(domain=com)[0]
+            try:
+                posts_count = self.api.wall.get(domain=com)[0]
+            except VkAPIError:
+                print('lol')
+
 
             t1 = 0
             for i in range(TIMES):
                 st = time.time()
-                getters.get_posts_asy(com, members_count)
+                getters.get_posts_asy(com, posts_count)
                 t1 += time.time() - st
 
             t1 /= TIMES
@@ -219,16 +241,17 @@ class GettersTestCase(unittest.TestCase):
             t2 = 0
             for i in range(TIMES):
                 st = time.time()
-                getters.get_posts(com, members_count)
+                getters.get_posts(com, posts_count)
                 t2 += time.time() - st
 
             t2 /= TIMES
 
-            logging.debug("{0}    |   {1:.5f}    |   {2:.5f}".format(members_count, t1, t2))
+            logging.debug("{0}    |   {1:.5f}    |   {2:.5f}".format(posts_count, t1, t2))
 
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(levelname)-8s [%(asctime)s] %(message)s',
                         level=logging.DEBUG, filename="datahound.log")
+
     unittest.main()
 

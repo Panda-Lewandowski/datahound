@@ -1,6 +1,6 @@
 import logging
 
-TOKEN = ""
+TOKEN = "096fb3f012902b5a1238fbbf1ef8ecbb23ff10d1a43c16e220ad8eff415791d6e801127a2c6aa60ca9c25"
 GOOGLE_TOKEN = ""
 BASE_URL = "https://api.vk.com/method/execute."
 MEMBERS_FIELDS = "sex"  # bdate, city, country, online, online_mobile, education, last_seen, relation
@@ -10,7 +10,7 @@ PLATFORM = {1: "Mobile", 2: 'iPhone', 3: "iPad", 4: "Android",
 SEX_COLORS = ['#FFD7E9', '#6495ED', '#B22222']
 PLATFORM_COLORS = ['#66CDAA', '#EE5C42', '#B22222', '#1874CD']
 SYSTEM_COLORS = ['#8B8386', '#FFE4C4']
-LOG_LEVEL = logging.INFO
+LOG_LEVEL = logging.DEBUG
 
 
 COUNTRIES = {1: 'Россия',
